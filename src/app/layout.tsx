@@ -24,6 +24,7 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
         <meta name="robots" content="noindex" />
+        <meta name="base:app_id" content="6977f1ce3a92926b661fd741" />
       </head>
       <body>
         <Providers>{children}</Providers>
