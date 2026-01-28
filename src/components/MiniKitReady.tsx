@@ -4,51 +4,46 @@ import { useEffect } from "react";
 
 /**
  * Компонент для сигнализации готовности приложения в Base App
- * Использует официальный SDK @coinbase/onchainkit с хуком useMiniKit
+ * Отправляет событие готовности через postMessage
  */
 export default function MiniKitReady() {
   useEffect(() => {
-    // Проверяем, доступен ли MiniKit SDK
-    if (typeof window !== "undefined") {
-      // Небольшая задержка для полной инициализации
-      const timer = setTimeout(() => {
-        try {
-          // Пытаемся использовать официальный SDK
-          import("@coinbase/onchainkit/minikit")
-            .then((module) => {
-              // Если SDK доступен, используем его API
-              // Но так как мы не можем использовать хук здесь напрямую,
-              // отправляем событие готовности через postMessage
-              // Base App принимает оба формата
-              if (window.parent !== window) {
-                window.parent.postMessage({ type: "miniapp:ready" }, "*");
-                // Повторяем для надёжности
-                setTimeout(() => {
-                  if (window.parent !== window) {
-                    window.parent.postMessage({ type: "miniapp:ready" }, "*");
-                  }
-                }, 200);
-              }
-              console.log("MiniKit SDK loaded, ready signal sent");
-            })
-            .catch((error) => {
-              // Если SDK не доступен, используем fallback через postMessage
-              console.warn("MiniKit SDK not available, using postMessage fallback:", error);
-              if (window.parent !== window) {
-                window.parent.postMessage({ type: "miniapp:ready" }, "*");
-              }
-            });
-        } catch (error) {
-          console.error("Error initializing MiniKit:", error);
-          // Fallback на postMessage
-          if (window.parent !== window) {
-            window.parent.postMessage({ type: "miniapp:ready" }, "*");
-          }
-        }
-      }, 1000); // Задержка для полной инициализации React компонентов
+    if (typeof window === "undefined") return;
 
-      return () => clearTimeout(timer);
+    // Функция для отправки события готовности
+    const sendReadySignal = () => {
+      try {
+        // Base App ожидает событие через postMessage с типом "miniapp:ready"
+        if (window.parent !== window) {
+          window.parent.postMessage({ type: "miniapp:ready" }, "*");
+        }
+        // Также отправляем событие в текущее окно
+        window.dispatchEvent(new CustomEvent("miniapp:ready"));
+        console.log("Mini app ready signal sent");
+      } catch (error) {
+        console.error("Error sending ready signal:", error);
+      }
+    };
+
+    // Отправляем после полной инициализации React компонентов
+    const timer1 = setTimeout(sendReadySignal, 1000);
+    const timer2 = setTimeout(sendReadySignal, 2000);
+    const timer3 = setTimeout(sendReadySignal, 3000);
+
+    // Также отправляем после полной загрузки страницы
+    if (document.readyState === "complete") {
+      setTimeout(sendReadySignal, 1500);
+    } else {
+      window.addEventListener("load", () => {
+        setTimeout(sendReadySignal, 1500);
+      });
     }
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+    };
   }, []);
 
   return null; // Компонент не рендерит ничего
