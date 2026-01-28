@@ -27,15 +27,16 @@ export default function Providers({ children }: { children: ReactNode }) {
     // Обновляем конфиг после монтирования на клиенте
     setConfig(getConfig());
 
-    // Отправляем событие готовности для Base App
+    // Отправляем событие готовности для Base App после полной инициализации
     if (typeof window !== "undefined") {
-      // Небольшая задержка для полной инициализации
+      // Увеличиваем задержку для полной инициализации всех компонентов
       setTimeout(() => {
         try {
           // Отправляем событие готовности через postMessage (для Base App preview)
+          // Base App ожидает простой формат
           if (window.parent !== window) {
             window.parent.postMessage(
-              { type: "miniapp:ready", source: "degen-memory" },
+              { type: "miniapp:ready" },
               "*"
             );
           }
@@ -44,7 +45,7 @@ export default function Providers({ children }: { children: ReactNode }) {
         } catch (error) {
           console.error("Error sending ready event:", error);
         }
-      }, 100);
+      }, 1000);
     }
   }, []);
 
