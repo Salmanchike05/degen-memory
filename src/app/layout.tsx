@@ -4,7 +4,7 @@ import "./ready";
 import Providers from "@/components/Providers";
 import { minikitConfig } from "@/minikit.config";
 
-const BASE_APP_ID = "6977f1ce3a92926b661fd741";
+const BASE_APP_ID = "697a8345a35c6ecde6aca552";
 const miniapp = minikitConfig.miniapp;
 
 // Статический metadata, как требует Base (в их примере показан именно статический export)
