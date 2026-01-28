@@ -4,6 +4,8 @@ import "./ready";
 import Providers from "@/components/Providers";
 import { minikitConfig } from "@/minikit.config";
 
+const BASE_APP_ID = "6977f1ce3a92926b661fd741";
+
 export async function generateMetadata(): Promise<Metadata> {
   const miniapp = minikitConfig.miniapp;
 
@@ -11,6 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: miniapp.name,
     description: miniapp.description,
     other: {
+      "base:app_id": BASE_APP_ID,
       "fc:miniapp": JSON.stringify({
         version: "next",
         imageUrl: miniapp.heroImageUrl,
@@ -40,11 +43,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-        <meta name="robots" content="noindex" />
-        <meta name="base:app_id" content="6977f1ce3a92926b661fd741" />
-      </head>
       <body>
         <Providers>{children}</Providers>
       </body>
