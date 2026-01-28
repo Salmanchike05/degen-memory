@@ -5,29 +5,27 @@ import Providers from "@/components/Providers";
 import { minikitConfig } from "@/minikit.config";
 
 const BASE_APP_ID = "6977f1ce3a92926b661fd741";
+const miniapp = minikitConfig.miniapp;
 
-export async function generateMetadata(): Promise<Metadata> {
-  const miniapp = minikitConfig.miniapp;
-
-  return {
-    title: miniapp.name,
-    description: miniapp.description,
-    other: {
-      "base:app_id": BASE_APP_ID,
-      "fc:miniapp": JSON.stringify({
-        version: "next",
-        imageUrl: miniapp.heroImageUrl,
-        button: {
-          title: `Play ${miniapp.name}`,
-          action: {
-            type: "launch_frame",
-            url: miniapp.homeUrl,
-          },
+// Статический metadata, как требует Base (в их примере показан именно статический export)
+export const metadata: Metadata = {
+  title: miniapp.name,
+  description: miniapp.description,
+  other: {
+    "base:app_id": BASE_APP_ID,
+    "fc:miniapp": JSON.stringify({
+      version: "next",
+      imageUrl: miniapp.heroImageUrl,
+      button: {
+        title: `Play ${miniapp.name}`,
+        action: {
+          type: "launch_frame",
+          url: miniapp.homeUrl,
         },
-      }),
-    },
-  };
-}
+      },
+    }),
+  },
+};
 
 export const viewport: Viewport = {
   width: "device-width",
