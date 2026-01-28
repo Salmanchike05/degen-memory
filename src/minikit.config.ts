@@ -18,7 +18,7 @@ export const minikitConfig = {
   miniapp: {
     version: "1",
     name: "Degen Memory",
-    subtitle: "Test your memory with crypto tokens",
+    subtitle: "Match crypto tokens",
     description:
       "A fun memory matching game featuring popular crypto tokens. Match pairs of tokens to win!",
     screenshotUrls: [`${ROOT_URL}/screenshot-portrait.png`],
@@ -30,9 +30,10 @@ export const minikitConfig = {
     primaryCategory: "games",
     tags: ["memory", "games", "crypto", "tokens", "puzzle"],
     heroImageUrl: `${ROOT_URL}/hero.png`,
-    tagline: "Match crypto tokens and test your memory!",
-    ogTitle: "Degen Memory - Crypto Token Memory Game",
+    tagline: "Match tokens to win!",
+    ogTitle: "Degen Memory Game",
     ogDescription: "Test your memory with popular crypto tokens in this fun matching game",
     ogImageUrl: `${ROOT_URL}/og-image.png`,
+    noindex: true,
   },
 } as const;
