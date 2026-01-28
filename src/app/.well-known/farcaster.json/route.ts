@@ -22,6 +22,7 @@ export async function GET() {
       ogTitle: minikitConfig.miniapp.ogTitle,
       ogDescription: minikitConfig.miniapp.ogDescription,
       ogImageUrl: minikitConfig.miniapp.ogImageUrl,
+      noindex: minikitConfig.miniapp.noindex,
     },
   };
 
