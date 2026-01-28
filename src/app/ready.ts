@@ -4,31 +4,23 @@
  */
 
 if (typeof window !== "undefined") {
-  // Отправляем событие готовности после загрузки DOM
-  if (document.readyState === "complete") {
-    sendReadyEvent();
-  } else {
-    window.addEventListener("load", sendReadyEvent);
-  }
-
   function sendReadyEvent() {
     try {
       // Отправляем событие через postMessage для iframe (Base App preview)
+      // Base App ожидает простой формат без лишних полей
       if (window.parent !== window) {
         window.parent.postMessage(
           {
             type: "miniapp:ready",
-            source: "degen-memory",
-            timestamp: Date.now(),
           },
           "*"
         );
       }
 
-      // Отправляем событие в текущее окно
+      // Также отправляем событие в текущее окно
       window.dispatchEvent(
         new CustomEvent("miniapp:ready", {
-          detail: { timestamp: Date.now() },
+          detail: {},
         })
       );
 
@@ -36,5 +28,22 @@ if (typeof window !== "undefined") {
     } catch (error) {
       console.error("Error sending ready event:", error);
     }
+  }
+
+  // Отправляем событие готовности после полной загрузки DOM и всех ресурсов
+  if (document.readyState === "complete") {
+    // Небольшая задержка для полной инициализации React компонентов
+    setTimeout(sendReadyEvent, 500);
+  } else {
+    window.addEventListener("load", () => {
+      setTimeout(sendReadyEvent, 500);
+    });
+  }
+
+  // Дополнительно отправляем после полной загрузки всех скриптов
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      setTimeout(sendReadyEvent, 1000);
+    });
   }
 }
