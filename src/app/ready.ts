@@ -1,20 +1,29 @@
 /**
  * Base App Ready Event Handler
  * Отправляет событие готовности приложения для Base App preview
+ * 
+ * Base App ожидает событие через postMessage с типом "miniapp:ready"
  */
 
 if (typeof window !== "undefined") {
   function sendReadyEvent() {
     try {
       // Отправляем событие через postMessage для iframe (Base App preview)
-      // Base App ожидает простой формат без лишних полей
+      // Base App ожидает простой формат: { type: "miniapp:ready" }
       if (window.parent !== window) {
         window.parent.postMessage(
-          {
-            type: "miniapp:ready",
-          },
+          { type: "miniapp:ready" },
           "*"
         );
+        // Повторяем для надёжности
+        setTimeout(() => {
+          if (window.parent !== window) {
+            window.parent.postMessage(
+              { type: "miniapp:ready" },
+              "*"
+            );
+          }
+        }, 200);
       }
 
       // Также отправляем событие в текущее окно
@@ -32,18 +41,22 @@ if (typeof window !== "undefined") {
 
   // Отправляем событие готовности после полной загрузки DOM и всех ресурсов
   if (document.readyState === "complete") {
-    // Небольшая задержка для полной инициализации React компонентов
-    setTimeout(sendReadyEvent, 500);
+    // Задержка для полной инициализации React компонентов
+    setTimeout(sendReadyEvent, 1000);
+    // Повторяем через дополнительную задержку
+    setTimeout(sendReadyEvent, 2000);
   } else {
     window.addEventListener("load", () => {
-      setTimeout(sendReadyEvent, 500);
+      setTimeout(sendReadyEvent, 1000);
+      setTimeout(sendReadyEvent, 2000);
     });
   }
 
   // Дополнительно отправляем после полной загрузки всех скриптов
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
-      setTimeout(sendReadyEvent, 1000);
+      setTimeout(sendReadyEvent, 1500);
+      setTimeout(sendReadyEvent, 2500);
     });
   }
 }
