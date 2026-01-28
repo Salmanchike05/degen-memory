@@ -43,6 +43,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* Дублируем метатег явно в <head>, как просит Base */}
+        <meta name="base:app_id" content={BASE_APP_ID} />
+      </head>
       <body>
         <Providers>{children}</Providers>
       </body>
