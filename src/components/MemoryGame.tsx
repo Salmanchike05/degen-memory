@@ -9,7 +9,8 @@ import {
   copyToClipboard, 
   generateFullShareText,
   shareToTwitter,
-  shareToFarcaster 
+  shareToFarcaster,
+  downloadResultImage
 } from "@/lib/share";
 
 // Crypto token images - расширенный список для всех уровней
@@ -63,6 +64,7 @@ export default function MemoryGame() {
   const [showLevelSelect, setShowLevelSelect] = useState(true);
   const [finalScore, setFinalScore] = useState<number | null>(null);
   const [shareSuccess, setShareSuccess] = useState(false);
+  const [downloadingImage, setDownloadingImage] = useState(false);
 
   const config = DIFFICULTIES[difficulty];
 
@@ -206,7 +208,7 @@ export default function MemoryGame() {
       address: address || undefined,
     };
 
-    // Пытаемся использовать нативный шаринг
+    // Пытаемся использовать нативный шаринг (теперь с изображением)
     const shared = await shareNative(shareData);
     
     if (shared) {
@@ -222,6 +224,30 @@ export default function MemoryGame() {
     if (copied) {
       setShareSuccess(true);
       setTimeout(() => setShareSuccess(false), 3000);
+    }
+  };
+
+  const handleDownloadImage = async () => {
+    if (!finalScore) return;
+
+    setDownloadingImage(true);
+    const shareData = {
+      score: finalScore,
+      moves,
+      difficulty,
+      address: address || undefined,
+    };
+
+    const downloaded = await downloadResultImage(shareData);
+    
+    if (downloaded) {
+      setShareSuccess(true);
+      setTimeout(() => {
+        setShareSuccess(false);
+        setDownloadingImage(false);
+      }, 2000);
+    } else {
+      setDownloadingImage(false);
     }
   };
 
@@ -355,23 +381,43 @@ export default function MemoryGame() {
                 </button>
               </div>
               
-              {/* Copy Link Button */}
-              <button
-                onClick={handleShare}
-                className="px-6 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
-              >
-                {shareSuccess ? (
-                  <>
-                    <span>✓</span>
-                    <span>Link Copied!</span>
-                  </>
-                ) : (
-                  <>
-                    <span>📋</span>
-                    <span>Copy Link</span>
-                  </>
-                )}
-              </button>
+              {/* Copy Link and Download Image Buttons */}
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={handleShare}
+                  className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+                >
+                  {shareSuccess ? (
+                    <>
+                      <span>✓</span>
+                      <span className="text-sm">Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>📋</span>
+                      <span className="text-sm">Copy Link</span>
+                    </>
+                  )}
+                </button>
+                
+                <button
+                  onClick={handleDownloadImage}
+                  disabled={downloadingImage}
+                  className="px-4 py-2 bg-purple-700 hover:bg-purple-600 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+                >
+                  {downloadingImage ? (
+                    <>
+                      <span className="animate-spin">⏳</span>
+                      <span className="text-sm">Generating...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>📸</span>
+                      <span className="text-sm">Download Image</span>
+                    </>
+                  )}
+                </button>
+              </div>
               
               <div className="flex gap-3 justify-center pt-2 border-t border-gray-700">
                 <button
