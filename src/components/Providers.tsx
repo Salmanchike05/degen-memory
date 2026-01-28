@@ -4,6 +4,7 @@ import { ReactNode, useState, useEffect } from "react";
 import { WagmiProvider } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { getConfig } from "@/lib/wagmi";
+import MiniKitReady from "./MiniKitReady";
 
 // Создаем QueryClient внутри компонента для избежания проблем с SSR
 function createQueryClient() {
@@ -66,7 +67,14 @@ export default function Providers({ children }: { children: ReactNode }) {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        {mounted ? children : <div style={{ minHeight: "100vh" }}>{children}</div>}
+        {mounted ? (
+          <>
+            <MiniKitReady />
+            {children}
+          </>
+        ) : (
+          <div style={{ minHeight: "100vh" }}>{children}</div>
+        )}
       </QueryClientProvider>
     </WagmiProvider>
   );
