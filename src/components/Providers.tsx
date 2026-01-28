@@ -29,23 +29,36 @@ export default function Providers({ children }: { children: ReactNode }) {
 
     // Отправляем событие готовности для Base App после полной инициализации
     if (typeof window !== "undefined") {
-      // Увеличиваем задержку для полной инициализации всех компонентов
-      setTimeout(() => {
+      // Функция для отправки события готовности
+      const sendReadySignal = () => {
         try {
-          // Отправляем событие готовности через postMessage (для Base App preview)
-          // Base App ожидает простой формат
+          // Base App ожидает событие через postMessage с типом "miniapp:ready"
           if (window.parent !== window) {
-            window.parent.postMessage(
-              { type: "miniapp:ready" },
-              "*"
-            );
+            // Отправляем несколько раз для надёжности
+            window.parent.postMessage({ type: "miniapp:ready" }, "*");
+            // Повторяем через небольшую задержку
+            setTimeout(() => {
+              window.parent.postMessage({ type: "miniapp:ready" }, "*");
+            }, 100);
           }
           // Также отправляем событие в текущее окно
           window.dispatchEvent(new CustomEvent("miniapp:ready"));
         } catch (error) {
           console.error("Error sending ready event:", error);
         }
-      }, 1000);
+      };
+
+      // Отправляем после полной инициализации React компонентов
+      setTimeout(sendReadySignal, 1500);
+      
+      // Дополнительно отправляем после полной загрузки страницы
+      if (document.readyState === "complete") {
+        setTimeout(sendReadySignal, 2000);
+      } else {
+        window.addEventListener("load", () => {
+          setTimeout(sendReadySignal, 2000);
+        });
+      }
     }
   }, []);
 
