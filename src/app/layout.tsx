@@ -1,11 +1,29 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Providers from "@/components/Providers";
+import { minikitConfig } from "@/minikit.config";
 
-export const metadata: Metadata = {
-  title: "Degen Memory",
-  description: "Test your memory with crypto tokens",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const miniapp = minikitConfig.miniapp;
+
+  return {
+    title: miniapp.name,
+    description: miniapp.description,
+    other: {
+      "fc:miniapp": JSON.stringify({
+        version: "next",
+        imageUrl: miniapp.heroImageUrl,
+        button: {
+          title: `Play ${miniapp.name}`,
+          action: {
+            type: "launch_frame",
+            url: miniapp.homeUrl,
+          },
+        },
+      }),
+    },
+  };
+}
 
 export const viewport: Viewport = {
   width: "device-width",
