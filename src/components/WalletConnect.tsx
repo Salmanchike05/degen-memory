@@ -1,13 +1,21 @@
 "use client";
 
 import { useAccount, useConnect, useDisconnect } from "wagmi";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function WalletConnect() {
   const { address, isConnected } = useAccount();
-  const { connect, connectors, isPending } = useConnect();
+  const { connect, connectors, isPending, error } = useConnect();
   const { disconnect } = useDisconnect();
   const [showMenu, setShowMenu] = useState(false);
+
+  // Обрабатываем ошибки подключения
+  useEffect(() => {
+    if (error) {
+      console.error("Wallet connection error:", error);
+      // Не блокируем приложение при ошибке подключения
+    }
+  }, [error]);
 
   // В Base App автоматически подключается через farcasterMiniApp connector
   const farcasterConnector = connectors.find(

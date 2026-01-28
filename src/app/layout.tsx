@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import "./ready";
 import Providers from "@/components/Providers";
 import { minikitConfig } from "@/minikit.config";
 

@@ -26,6 +26,26 @@ export default function Providers({ children }: { children: ReactNode }) {
     setMounted(true);
     // Обновляем конфиг после монтирования на клиенте
     setConfig(getConfig());
+
+    // Отправляем событие готовности для Base App
+    if (typeof window !== "undefined") {
+      // Небольшая задержка для полной инициализации
+      setTimeout(() => {
+        try {
+          // Отправляем событие готовности через postMessage (для Base App preview)
+          if (window.parent !== window) {
+            window.parent.postMessage(
+              { type: "miniapp:ready", source: "degen-memory" },
+              "*"
+            );
+          }
+          // Также отправляем событие в текущее окно
+          window.dispatchEvent(new CustomEvent("miniapp:ready"));
+        } catch (error) {
+          console.error("Error sending ready event:", error);
+        }
+      }, 100);
+    }
   }, []);
 
   // На сервере используем SSR конфиг, на клиенте - полный
