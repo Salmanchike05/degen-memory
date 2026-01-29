@@ -12,6 +12,7 @@ import {
   shareToFarcaster,
   downloadResultImage
 } from "@/lib/share";
+import { playMatch, playWrong, playWin } from "@/lib/sounds";
 
 // Crypto token images - расширенный список для всех уровней
 const TOKENS = [
@@ -145,6 +146,7 @@ export default function MemoryGame() {
 
     if (firstCard && secondCard && firstCard.tokenId === secondCard.tokenId) {
       // Match found
+      playMatch();
       const updatedCards = currentCards.map((c) =>
         c.id === firstId || c.id === secondId
           ? { ...c, isMatched: true, isFlipped: true }
@@ -156,6 +158,7 @@ export default function MemoryGame() {
       // Check if game is won
       if (matches + 1 === config.pairs) {
         setTimeout(() => {
+          playWin();
           // Рассчитываем очки
           const score = calculateScore({
             moves: moves + 1, // +1 потому что это текущий ход
@@ -177,6 +180,7 @@ export default function MemoryGame() {
       }
     } else {
       // No match - flip cards back
+      playWrong();
       const updatedCards = currentCards.map((c) =>
         flipped.includes(c.id) ? { ...c, isFlipped: false } : c
       );
