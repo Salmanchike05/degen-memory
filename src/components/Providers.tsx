@@ -27,40 +27,6 @@ export default function Providers({ children }: { children: ReactNode }) {
     setMounted(true);
     // Обновляем конфиг после монтирования на клиенте
     setConfig(getConfig());
-
-    // Отправляем событие готовности для Base App после полной инициализации
-    if (typeof window !== "undefined") {
-      // Функция для отправки события готовности
-      const sendReadySignal = () => {
-        try {
-          // Base App ожидает событие через postMessage с типом "miniapp:ready"
-          if (window.parent !== window) {
-            // Отправляем несколько раз для надёжности
-            window.parent.postMessage({ type: "miniapp:ready" }, "*");
-            // Повторяем через небольшую задержку
-            setTimeout(() => {
-              window.parent.postMessage({ type: "miniapp:ready" }, "*");
-            }, 100);
-          }
-          // Также отправляем событие в текущее окно
-          window.dispatchEvent(new CustomEvent("miniapp:ready"));
-        } catch (error) {
-          console.error("Error sending ready event:", error);
-        }
-      };
-
-      // Отправляем после полной инициализации React компонентов
-      setTimeout(sendReadySignal, 1500);
-      
-      // Дополнительно отправляем после полной загрузки страницы
-      if (document.readyState === "complete") {
-        setTimeout(sendReadySignal, 2000);
-      } else {
-        window.addEventListener("load", () => {
-          setTimeout(sendReadySignal, 2000);
-        });
-      }
-    }
   }, []);
 
   // На сервере используем SSR конфиг, на клиенте - полный
