@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import "./ready";
 import Providers from "@/components/Providers";
 import { minikitConfig } from "@/minikit.config";
 
@@ -14,7 +13,7 @@ export const metadata: Metadata = {
   other: {
     "base:app_id": BASE_APP_ID,
     "fc:miniapp": JSON.stringify({
-      version: "next",
+      version: "1",
       imageUrl: miniapp.heroImageUrl,
       button: {
         title: `Play ${miniapp.name}`,
