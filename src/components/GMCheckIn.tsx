@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAccount, useSignMessage, useSendTransaction } from "wagmi";
 import {
   getToday,
@@ -13,6 +13,7 @@ import {
   RESTORE_AMOUNT_ETH,
   RESTORE_AMOUNT_WEI,
 } from "@/lib/gm";
+
 const GM_PAYMENT_RECIPIENT =
   process.env.NEXT_PUBLIC_GM_PAYMENT_RECIPIENT?.trim() ||
   "0x70CD3bB0D2bC142e3392558D59a8070fF04D939a";
@@ -22,6 +23,8 @@ export default function GMCheckIn() {
   const [streak, setStreak] = useState(0);
   const [canCheckIn, setCanCheckIn] = useState(false);
   const [canRestore, setCanRestore] = useState(false);
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
 
   const { signMessageAsync, isPending: isSigning } = useSignMessage();
   const { sendTransactionAsync, isPending: isSending } = useSendTransaction();
@@ -38,6 +41,14 @@ export default function GMCheckIn() {
     setCanRestore(canRestoreYesterday(address));
   }, [address]);
 
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    if (open) document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [open]);
+
   const handleCheckIn = async () => {
     if (!address || !canCheckIn) return;
     const today = getToday();
@@ -48,6 +59,7 @@ export default function GMCheckIn() {
       setStreak(getStreak(address));
       setCanCheckIn(false);
       setCanRestore(canRestoreYesterday(address));
+      setOpen(false);
     } catch (e) {
       console.error("GM sign error:", e);
     }
@@ -69,6 +81,7 @@ export default function GMCheckIn() {
         addRestore(address, yesterday, hash);
         setStreak(getStreak(address));
         setCanRestore(false);
+        setOpen(false);
       }
     } catch (e) {
       console.error("GM restore payment error:", e);
@@ -78,48 +91,48 @@ export default function GMCheckIn() {
   if (!isConnected || !address) return null;
 
   const hasRecipient = GM_PAYMENT_RECIPIENT && GM_PAYMENT_RECIPIENT.length === 42;
+  const showActions = canCheckIn || (canRestore && hasRecipient);
 
   return (
-    <div className="rounded-lg border border-gray-700 bg-gray-900/80 p-4">
-      <div className="mb-3 flex items-center justify-between">
-        <span className="font-semibold text-purple-300">GM streak</span>
-        <span className="text-2xl font-bold tabular-nums">{streak}</span>
-      </div>
-      <p className="mb-3 text-xs text-gray-400">
-        Отмечайся каждый день подписью (бесплатно). Пропустил день — восстанови за {RESTORE_AMOUNT_ETH} ETH.
-      </p>
-      <div className="flex flex-col gap-2">
-        {canCheckIn && (
-          <button
-            type="button"
-            onClick={handleCheckIn}
-            disabled={isSigning}
-            className="w-full rounded-lg bg-purple-600 py-2.5 font-semibold text-white transition-colors hover:bg-purple-500 disabled:opacity-50"
-          >
-            {isSigning ? "Подпись…" : "GM — отметить сегодня"}
-          </button>
-        )}
-        {canRestore && hasRecipient && (
-          <button
-            type="button"
-            onClick={handleRestore}
-            disabled={isSending}
-            className="w-full rounded-lg border border-amber-600 bg-amber-900/40 py-2.5 font-semibold text-amber-200 transition-colors hover:bg-amber-900/60 disabled:opacity-50"
-          >
-            {isSending ? "Отправка…" : `Восстановить вчера — ${RESTORE_AMOUNT_ETH} ETH`}
-          </button>
-        )}
-        {canRestore && !hasRecipient && (
-          <p className="text-xs text-gray-500">
-            Восстановление отключено: не задан NEXT_PUBLIC_GM_PAYMENT_RECIPIENT.
-          </p>
-        )}
-        {!canCheckIn && !canRestore && streak > 0 && (
-          <p className="text-center text-sm text-gray-400">
-            Сегодня уже отмечен. Заходи завтра.
-          </p>
-        )}
-      </div>
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-1 rounded-md bg-gray-800 px-2 py-1.5 text-xs font-medium text-purple-300 transition-colors hover:bg-gray-700"
+        title="GM streak"
+      >
+        GM — <span className="tabular-nums">{streak}</span>
+      </button>
+
+      {open && showActions && (
+        <div className="absolute right-0 top-full z-50 mt-1 w-48 rounded-lg border border-gray-700 bg-gray-900 py-1 shadow-lg">
+          {canCheckIn && (
+            <button
+              type="button"
+              onClick={handleCheckIn}
+              disabled={isSigning}
+              className="w-full px-3 py-2 text-left text-sm text-white hover:bg-gray-800 disabled:opacity-50"
+            >
+              {isSigning ? "Подпись…" : "Отметить сегодня"}
+            </button>
+          )}
+          {canRestore && hasRecipient && (
+            <button
+              type="button"
+              onClick={handleRestore}
+              disabled={isSending}
+              className="w-full px-3 py-2 text-left text-sm text-amber-200 hover:bg-gray-800 disabled:opacity-50"
+            >
+              {isSending ? "Отправка…" : `Восстановить — ${RESTORE_AMOUNT_ETH} ETH`}
+            </button>
+          )}
+        </div>
+      )}
+      {open && !showActions && (
+        <div className="absolute right-0 top-full z-50 mt-1 w-44 rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-xs text-gray-400 shadow-lg">
+          Сегодня уже отмечен
+        </div>
+      )}
     </div>
   );
 }
