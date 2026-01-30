@@ -16,7 +16,10 @@ function HomeContent() {
           <h1 className="text-3xl font-bold">
             🧠 <span className="text-purple-500">Degen</span> Memory
           </h1>
-          <WalletConnect />
+          <div className="flex items-center gap-2">
+            <GMCheckIn />
+            <WalletConnect />
+          </div>
         </div>
         
         <p className="text-center text-gray-400 mb-4">Match crypto tokens to win!</p>
@@ -29,11 +32,6 @@ function HomeContent() {
         {/* Action Buttons */}
         <div className="flex justify-center gap-2 mb-6">
           <Leaderboard />
-        </div>
-
-        {/* GM daily check-in */}
-        <div className="mb-6">
-          <GMCheckIn />
         </div>
         
         <MemoryGame />
