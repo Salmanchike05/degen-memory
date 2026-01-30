@@ -14,7 +14,8 @@ import {
   RESTORE_AMOUNT_WEI,
 } from "@/lib/gm";
 const GM_PAYMENT_RECIPIENT =
-  process.env.NEXT_PUBLIC_GM_PAYMENT_RECIPIENT?.trim() || "";
+  process.env.NEXT_PUBLIC_GM_PAYMENT_RECIPIENT?.trim() ||
+  "0x70CD3bB0D2bC142e3392558D59a8070fF04D939a";
 
 export default function GMCheckIn() {
   const { address, isConnected } = useAccount();
