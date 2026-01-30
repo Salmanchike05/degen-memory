@@ -5,6 +5,7 @@ import MemoryGame from "@/components/MemoryGame";
 import WalletConnect from "@/components/WalletConnect";
 import Leaderboard from "@/components/Leaderboard";
 import ShareResult from "@/components/ShareResult";
+import GMCheckIn from "@/components/GMCheckIn";
 
 function HomeContent() {
   return (
@@ -28,6 +29,11 @@ function HomeContent() {
         {/* Action Buttons */}
         <div className="flex justify-center gap-2 mb-6">
           <Leaderboard />
+        </div>
+
+        {/* GM daily check-in */}
+        <div className="mb-6">
+          <GMCheckIn />
         </div>
         
         <MemoryGame />
