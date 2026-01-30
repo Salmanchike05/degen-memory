@@ -48,6 +48,7 @@ Deploy to Vercel for easy hosting:
 2. Import the repository to Vercel
 3. Set environment variables:
    - `NEXT_PUBLIC_URL` - Your production URL
+   - `NEXT_PUBLIC_GM_PAYMENT_RECIPIENT` - (optional) Ethereum address to receive 0.0001 ETH when a user restores a missed GM day
 4. Deploy
 
 After deployment, follow the [Base App documentation](https://docs.base.org/mini-apps/quickstart/create-new-miniapp) to:
