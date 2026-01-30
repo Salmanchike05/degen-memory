@@ -101,7 +101,7 @@ export default function GMCheckIn() {
         className="flex items-center gap-1 rounded-md bg-gray-800 px-2 py-1.5 text-xs font-medium text-purple-300 transition-colors hover:bg-gray-700"
         title="GM streak"
       >
-        GM — <span className="tabular-nums">{streak}</span>
+        🔥 GM <span className="tabular-nums">{streak}</span>
       </button>
 
       {open && showActions && (
